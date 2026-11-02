@@ -1,0 +1,38 @@
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: urlshortener_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret123
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+  backend:
+    build: ./backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/urlshortener_db
+      SPRING_DATA_REDIS_HOST: redis
+      APP_BASE_URL: http://localhost:8080
+      APP_SNOWFLAKE_SHARD_ID: 1
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:

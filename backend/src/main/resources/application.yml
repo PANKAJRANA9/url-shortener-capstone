@@ -1,0 +1,43 @@
+
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres:5432/urlshortener_db
+    username: postgres
+    password: secret123
+    hikari:
+      maximum-pool-size: 20
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+  data:
+    redis:
+      host: redis
+      port: 6379
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 20
+
+app:
+  base-url: http://localhost:8080
+  short-code:
+    length: 7
+    ttl-hours: 24
+  snowflake:
+    shard-id: 1
+  rate-limit:
+    requests-per-minute: 60
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+
+logging:
+  level:
+    com.urlshortener: DEBUG
